@@ -1,0 +1,27 @@
+name: npm publish beta
+on: 
+  push:
+    branches:
+      - "dev"
+    paths:
+        - "package.json"
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: "16.13.0"
+      - name:  package 
+        run: |
+         npm i
+         npm run build-all
+      - name: publish npm 
+        uses: JS-DevTools/npm-publish@v1
+        with:
+          tag: beta
+          access: public
+          package: package.json
+          token: ${{ secrets.NPM_TOKEN }}

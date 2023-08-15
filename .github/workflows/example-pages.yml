@@ -1,0 +1,41 @@
+name: "git pages"
+on: 
+  workflow_dispatch:
+  push:
+    branches:
+      - "main"
+    paths:
+      - "src/**"
+  pull_request:
+    branches:
+      - "main"
+    paths:
+      - "src/**"
+
+# 作业
+jobs:
+  build-docs:
+    permissions: 
+      contents: write
+    runs-on: "windows-latest"
+    strategy:
+      matrix:
+        node-version: [16.13.0]
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v1
+        with:
+          node-version: "16.13.0"
+      - name: package docs page
+        run: |  
+          npm i 
+          npm run docs:build
+      - name: push 
+        uses: crazy-max/ghaction-github-pages@v3
+        with:
+          target_branch: gh-pages
+          build_dir: src/.vitepress/dist
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      
