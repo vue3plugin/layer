@@ -1,3 +1,4 @@
+import "./assets/index.css"
 //@ts-ignore
 import Demo from "./Demo.vue"
 import { add } from "./utils"
