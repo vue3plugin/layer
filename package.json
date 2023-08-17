@@ -1,5 +1,5 @@
 {
-  "name": "@v3p/npm-pkg-by-vite",
+  "name": "@v3p/layer",
   "version": "1.0.5-0",
   "description": "基于vite的npm包模板",
   "type": "module",
@@ -18,7 +18,7 @@
   },
   "scripts": {
     "docs:dev": "vitepress dev src",
-    "docs:build": "vitepress build src --base /npm-pkg-by-vite/",
+    "docs:build": "vitepress build src --base /layer/",
     "docs:preview": "vitepress preview src",
     "build": "vite build",
     "build-types": "vue-tsc -p ./tsconfig.types.json && api-extractor run -c api-extractor.json && node scripts/cleanup.js",
@@ -32,14 +32,14 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/vue3plugin/npm-pkg-by-vite.git"
+    "url": "git+https://github.com/vue3plugin/layer.git"
   },
   "author": "biancangming",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/vue3plugin/npm-pkg-by-vite/issues"
+    "url": "https://github.com/vue3plugin/layer/issues"
   },
-  "homepage": "https://github.com/vue3plugin/npm-pkg-by-vite#readme",
+  "homepage": "https://github.com/vue3plugin/layer#readme",
   "devDependencies": {
     "@microsoft/api-extractor": "^7.36.4",
     "@types/node": "^20.4.8",

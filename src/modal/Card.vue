@@ -7,15 +7,18 @@
     </Teleport>
 </template>
 <script setup lang="ts">
-import { reactive, shallowRef, ref, unref, computed, watch, type RendererElement, onMounted } from 'vue';
-import { isString } from "howtools"
+import { reactive, shallowRef, ref, unref, computed, watch, type RendererElement } from 'vue';
+import { getBoundingClientRectByTo, getBoundingClientRectByPointerEvent } from './componsition/tools';
+
 type Position = { top: number, left: number }
-const props = withDefaults(defineProps<{
+type Props = {
     top?: number, // 初始化位置，x坐标
     left?: number, // 初始化位置，y坐标
     to?: string | RendererElement | null | undefined, // 边界组件
     lockBoundary?: boolean,
-}>(),
+}
+
+const props = withDefaults(defineProps<Props>(),
     {
         top: 100,
         left: 200,
@@ -27,40 +30,15 @@ const postion = reactive<Position>({
     left: 0,
 })
 
-// 根据 boundingRef 确定元素活动最大边界
-const bounding = {
-    top: 0,
-    left: 0,
-    right: document.body.offsetLeft,
-    bottom: document.body.offsetHeight,
-}
-
-watch(props, ({ top, left, to }) => {
+watch(props, ({ top, left }) => {
     postion.top = top
     postion.left = left
 }, {
     immediate: true
 })
 
-setTimeout(() => {
-    const to = props.to
-    if (to) {
-        let el: RendererElement;
-        if (isString(to)) {
-            if (to.includes("#")) el = document.getElementById(to)
-            else el = document.querySelector(to)
-        } else {
-            el = to
-        }
-        debugger
-        const { top, left, width, height } = el.getBoundingClientRect()
-        console.log(el, { top, left, width, height })
-        bounding.top = top
-        bounding.left = left
-        bounding.right = left + width
-        bounding.bottom = top + height
-    }
-}, 100)
+// 根据 boundingRef 确定元素活动最大边界
+const bounding = computed(() => getBoundingClientRectByTo(props.to || "body"))
 
 const style = computed(() => ({ top: `${postion.top}px`, left: `${postion.left}px` }))
 
@@ -80,8 +58,8 @@ const targetDistance = {
 function pointerdown(e: PointerEvent) {
     e.stopPropagation()
     dragging.value = true
-    const { top, left, height, width } = unref(target).getBoundingClientRect()
-    console.log("pointerdown", { top, left, height, width }, bounding)
+    const { top, left, height, width } = getBoundingClientRectByPointerEvent(e)
+
     targetDistance.left = e.pageX - left
     targetDistance.top = e.pageY - top
 
@@ -96,19 +74,17 @@ function pointerdown(e: PointerEvent) {
 function pointermove(e: PointerEvent) {
     e.stopPropagation()
     if (!dragging.value) return
-    const left = e.pageX - bounding.left - targetDistance.left
-    const top = e.pageY - bounding.top - targetDistance.top
-
-
+    const left = e.pageX - unref(bounding).left - targetDistance.left
+    const top = e.pageY - unref(bounding).top - targetDistance.top
 
     // 如果边界被锁定，移动超出边界则不允许移动
-    // if (props.lockBoundary) {
-    const { top: ctop, left: cleft, height: cheight, width: cwidth } = (e.target as RendererElement).getBoundingClientRect()
+    if (props.lockBoundary) {
+        const { top: ctop, left: cleft, height: cheight, width: cwidth } = getBoundingClientRectByPointerEvent(e)
 
-    if (cleft < bounding.left || ctop < bounding.top || cleft + cwidth > bounding.right || ctop + cheight < bounding.top) {
-        return
+        if (cleft < unref(bounding).left || ctop < unref(bounding).top || cleft + cwidth > unref(bounding).right || ctop + cheight > unref(bounding).bottom) {
+            return
+        }
     }
-    // }
 
     postion.left = left
     postion.top = top
@@ -118,6 +94,4 @@ function pointerup(e: PointerEvent) {
     dragging.value = false
     document.removeEventListener("pointermove", pointermove)
 }
-
-// useEventListener(document, "mousemove", pointermove)
 </script>
