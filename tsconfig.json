@@ -27,7 +27,13 @@
       "checkJs": false,
       "allowJs": true,
       "esModuleInterop": true,
-      "importHelpers": false
+      "importHelpers": false,
+      "baseUrl": "./",
+      "paths": {
+        "@v3p/layer": [
+          "src/index.ts"
+        ]
+      }
   },
   "include": ["src/**/*", "env.d.ts",],
   "exclude": ["node_modules/**/*"]
