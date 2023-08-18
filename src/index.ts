@@ -1,5 +1,7 @@
-import { useLayerDialog } from "./modal"
+import { useLayerDialog , type LayerDialogProps, type LayerDialogPlaceMent } from "./modal"
 
 export {
-    useLayerDialog
+    useLayerDialog,
+    LayerDialogProps,
+    LayerDialogPlaceMent,
 }

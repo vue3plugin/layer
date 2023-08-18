@@ -1,7 +1,12 @@
 import { Ref, computed, ref, shallowRef, unref, watch } from "vue";
-import { LayerDialogProps, parserLayerPlacement } from './dialog';
+import { type LayerDialogPlaceMent, type LayerDialogProps, parserLayerPlacement } from './dialog';
 import { getBoundingClientRectByPointerEvent, getBoundingClientRectByTo } from "./componsition/tools";
 import { useElementVisibility, useEventListener } from "@vueuse/core"
+
+export {  
+    LayerDialogProps,
+    LayerDialogPlaceMent
+}
 /**
  * 
 */
@@ -15,17 +20,8 @@ export function useLayerDialog(target: Ref<HTMLElement | SVGElement | null | und
 
     // 监听目标元素是否可见
     watch(targetIsVisible, (visible) => {
-        const { top, left, el } = parserLayerPlacement(placement, target as Ref<HTMLElement>, to )
-        if(to.value = "body"){
-            unref(target).style.position = "fixed"
-        }else {
-            unref(target).style.position = "postion"
-            el.style.position = "relative"
-        }
-        visible ? postion.value = { top, left } : ''
+        visible ? setPlacement(placement) : ''
     })
-
-
 
     // 根据 boundingRef 确定元素活动最大边界
     const bounding = computed(() => getBoundingClientRectByTo(unref(to)))
@@ -56,7 +52,6 @@ export function useLayerDialog(target: Ref<HTMLElement | SVGElement | null | und
             targetDistance.width = width
         }
 
-        console.log(unref(bounding), { top, left, height, width })
         document.addEventListener("pointermove", pointermove)
     }
 
@@ -88,7 +83,19 @@ export function useLayerDialog(target: Ref<HTMLElement | SVGElement | null | und
     useEventListener(target, "pointermove", pointermove)
     useEventListener(target, "pointerup", pointerup)
 
+    function setPlacement(placement: LayerDialogPlaceMent){
+        const { top, left, el } = parserLayerPlacement(placement, target as Ref<HTMLElement>, to )
+        if(to.value == "body"){
+            unref(target).style.position = "fixed"
+        }else {
+            unref(target).style.position = "postion"
+            el.style.position = "relative"
+        }
+        postion.value = { top, left }
+    }
+
     return {
-        style
+        style,
+        setPlacement,
     }
 }

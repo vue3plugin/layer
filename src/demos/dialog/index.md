@@ -11,7 +11,7 @@ outlineTitle: '组件demo演示'
 
 ## 通过预览组件配置
 
-<preview path="./demo.vue" title="演示" description="巴拉巴拉巴拉" />
+<preview path="./demo/demo.vue" title="演示" description="巴拉巴拉巴拉" />
 
 ## 通过传统的方式引入
 
