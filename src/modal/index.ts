@@ -14,15 +14,16 @@ export {
 export function useLayerDialog(target: Ref<HTMLElement | SVGElement | null | undefined>, props?: LayerDialogProps) {
     type Position = { top: number, left: number }
 
-    const { placement = "auto", to = ref("body"), lockBoundary = "false" } = props || {}
+    const { placement = "auto", to = ref("body"), lockBoundary = false } = props || {}
     const targetIsVisible = useElementVisibility(target)
+    let lockInitPlacement = false // 锁定初始化时的，位置设置影响到 setPlacement 直接设置
     const zIndex = useZIndex()
 
     const postion = ref<Position>({ top: 0, left: 0 })
 
     // 监听目标元素是否可见
     watch(targetIsVisible, (visible) => {
-        visible ? setPlacement(placement) : ''
+        (visible && !lockInitPlacement) ? setPlacement(placement) : ''
     })
 
     // 根据 boundingRef 确定元素活动最大边界
@@ -85,9 +86,13 @@ export function useLayerDialog(target: Ref<HTMLElement | SVGElement | null | und
     useEventListener(target, "pointermove", pointermove)
     useEventListener(target, "pointerup", pointerup)
 
-    async function setPlacement(placement: LayerDialogPlaceMent) {
-        if (!target.value) await nextTick()
-        const { top, left } = parserLayerPlacement(placement, target as Ref<HTMLElement>, to)
+    async function setPlacement(_placement: LayerDialogPlaceMent) {
+        if (!target.value) {
+            lockInitPlacement = true
+            await nextTick()
+        }
+        
+        const { top, left } = parserLayerPlacement(_placement, target as Ref<HTMLElement>, to)
 
         // 设置Zindex
         unref(target).style.zIndex = zIndex.value + ''
@@ -99,6 +104,9 @@ export function useLayerDialog(target: Ref<HTMLElement | SVGElement | null | und
             unref(bounding).el.style.position = "relative"
         }
         postion.value = { top, left }
+        setTimeout(() => {
+            lockInitPlacement = false
+        }, 200);
     }
 
     return {
