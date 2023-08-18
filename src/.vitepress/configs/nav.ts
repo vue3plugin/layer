@@ -4,7 +4,7 @@ export default [
   {
     text: '更新日志',
     link:
-      'https://github.com/vue3plugin/npm-pkg-by-vite'
+      'https://github.com/vue3plugin/layer'
   }
 ]
 

@@ -21,8 +21,17 @@ export function useLayerDialog(target: Ref<HTMLElement | SVGElement | null | und
 
     const postion = ref<Position>({ top: 0, left: 0 })
 
-    // 监听目标元素是否可见
+    // 需要移动的元素
+    const handle = ref<HTMLElement>()
+
     watch(targetIsVisible, (visible) => {
+        if(visible){
+            // 处理需要移动的元素
+            const _handle = unref(target).querySelector("[handle]") as HTMLElement
+            _handle ? handle.value = _handle : handle.value = target.value as HTMLElement
+            handle.value.style.cursor = "move"
+        }
+        // 监听目标元素是否可见
         (visible && !lockInitPlacement) ? setPlacement(placement) : ''
     })
 
@@ -82,16 +91,16 @@ export function useLayerDialog(target: Ref<HTMLElement | SVGElement | null | und
         document.removeEventListener("pointermove", pointermove)
     }
 
-    useEventListener(target, "pointerdown", pointerdown)
-    useEventListener(target, "pointermove", pointermove)
-    useEventListener(target, "pointerup", pointerup)
+    useEventListener(handle, "pointerdown", pointerdown, { capture: true })
+    useEventListener(handle, "pointermove", pointermove, { capture: true })
+    useEventListener(target, "pointerup", pointerup, { capture: true })
 
     async function setPlacement(_placement: LayerDialogPlaceMent) {
         if (!target.value) {
             lockInitPlacement = true
             await nextTick()
         }
-        
+
         const { top, left } = parserLayerPlacement(_placement, target as Ref<HTMLElement>, to)
 
         // 设置Zindex
