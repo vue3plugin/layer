@@ -44,7 +44,7 @@ export function parserLayerPlacement(placement: LayerDialogPlaceMent, target: Re
     }
 
     if (placement == "b") {
-        return { top: toRect.top + toRect.height - targetRect.height, left }
+        return { top: toRect.height - targetRect.height, left }
     }
 
     if (placement == "l") {

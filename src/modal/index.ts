@@ -1,20 +1,22 @@
-import { Ref, computed, ref, shallowRef, unref, watch } from "vue";
+import { Ref, computed, ref, shallowRef, unref, watch, nextTick } from "vue";
 import { type LayerDialogPlaceMent, type LayerDialogProps, parserLayerPlacement } from './dialog';
 import { getBoundingClientRectByPointerEvent, getBoundingClientRectByTo } from "./componsition/tools";
 import { useElementVisibility, useEventListener } from "@vueuse/core"
+import { useZIndex } from "../shared/useZIndex";
 
-export {  
+export {
     LayerDialogProps,
     LayerDialogPlaceMent
 }
 /**
- * 
+ * @param target - 可拖动目标元素
 */
 export function useLayerDialog(target: Ref<HTMLElement | SVGElement | null | undefined>, props?: LayerDialogProps) {
     type Position = { top: number, left: number }
 
     const { placement = "auto", to = ref("body"), lockBoundary = "false" } = props || {}
     const targetIsVisible = useElementVisibility(target)
+    const zIndex = useZIndex()
 
     const postion = ref<Position>({ top: 0, left: 0 })
 
@@ -83,13 +85,18 @@ export function useLayerDialog(target: Ref<HTMLElement | SVGElement | null | und
     useEventListener(target, "pointermove", pointermove)
     useEventListener(target, "pointerup", pointerup)
 
-    function setPlacement(placement: LayerDialogPlaceMent){
-        const { top, left, el } = parserLayerPlacement(placement, target as Ref<HTMLElement>, to )
-        if(to.value == "body"){
+    async function setPlacement(placement: LayerDialogPlaceMent) {
+        if (!target.value) await nextTick()
+        const { top, left } = parserLayerPlacement(placement, target as Ref<HTMLElement>, to)
+
+        // 设置Zindex
+        unref(target).style.zIndex = zIndex.value + ''
+
+        if (to.value == "body") {
             unref(target).style.position = "fixed"
-        }else {
-            unref(target).style.position = "postion"
-            el.style.position = "relative"
+        } else {
+            unref(target).style.position = "absolute"
+            unref(bounding).el.style.position = "relative"
         }
         postion.value = { top, left }
     }

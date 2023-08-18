@@ -1,20 +1,21 @@
 ---
 title: 演示
 outline: [1,2]
-outlineTitle: '组件demo演示'
 ---
-# 组件演示
+# 弹窗组件
 
 ## 概要
 
-通过vitepress 创建：参考-> [https://vitepress.dev/guide/what-is-vitepress](https://vitepress.dev/guide/what-is-vitepress)
+意在打造一个自由弹窗，可根据自身需求定制。
 
-## 通过预览组件配置
+1. 支持自由拖动
+2. 指定拖动边界
 
-<preview path="./demo/demo.vue" title="演示" description="巴拉巴拉巴拉" />
+## 整个窗口弹出
 
-## 通过传统的方式引入
+<preview path="./demo/demo.vue" />
 
-<!-- :::preview 演示 || 巴拉巴拉巴拉 -->
+## 在指定区域弹出
 
-<!-- demo-preview=./demo.vue -->
+
+<preview path="./demo/demo2.vue" />
