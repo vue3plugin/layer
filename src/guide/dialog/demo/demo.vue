@@ -1,8 +1,8 @@
 <template>
-    <div ref="target" style="height: 200px;width: 300px;" class="rounded w-fit bg-black text-white p-4"
+    <div ref="target" style="height: 200px;width: 300px;" class="rounded w-fit bg-black text-white p-4" id="xxx"
         :style="{ ...style }" v-if="visible">
-        <div class=" flex justify-between">
-            <div handle>💥拖动标题</div>
+        <div class=" flex justify-between" >
+            <div move>💥拖动标题</div>
             <button class="btn" @click="close">X</button>
         </div>
         <div>设备离线，请立即检查</div>
@@ -28,7 +28,7 @@ import { ref } from 'vue';
 const target = ref()
 const visible = ref(false)
 
-const { style, setPlacement } = useLayerDialog(target, { placement: "auto", })
+const { style, setPlacement } = useLayerDialog(target, { placement: "auto", lockBoundary: true})
 
 function handlePlacement(placement: LayerDialogPlaceMent) {
     visible.value = true
@@ -36,7 +36,6 @@ function handlePlacement(placement: LayerDialogPlaceMent) {
 }
 
 function close(e) {
-    debugger
     visible.value = false
 }
 </script>

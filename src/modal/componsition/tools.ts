@@ -2,10 +2,10 @@ import { isString } from "howtools";
 import type { RendererElement } from "vue";
 
 export function getBoundingClientRect(el: RendererElement) {
-    const { top, left, height, width } = el.getBoundingClientRect()
+    const { x, y, top, left, height, width } = el.getBoundingClientRect()
     return {
-        x: top,
-        y: left,
+        x,
+        y,
         top,
         left,
         bottom: top + height,

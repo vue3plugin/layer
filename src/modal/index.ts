@@ -1,6 +1,6 @@
-import { Ref, computed, ref, shallowRef, unref, watch, nextTick } from "vue";
+import { Ref, computed, ref, shallowRef, unref, watch, nextTick, onMounted } from "vue";
 import { type LayerDialogPlaceMent, type LayerDialogProps, parserLayerPlacement } from './dialog';
-import { getBoundingClientRectByPointerEvent, getBoundingClientRectByTo } from "./componsition/tools";
+import { getBoundingClientRect, getBoundingClientRectByPointerEvent, getBoundingClientRectByTo } from "./componsition/tools";
 import { useElementVisibility, useEventListener } from "@vueuse/core"
 import { useZIndex } from "../shared/useZIndex";
 
@@ -25,9 +25,9 @@ export function useLayerDialog(target: Ref<HTMLElement | SVGElement | null | und
     const handle = ref<HTMLElement>()
 
     watch(targetIsVisible, (visible) => {
-        if(visible){
+        if (visible) {
             // 处理需要移动的元素
-            const _handle = unref(target).querySelector("[handle]") as HTMLElement
+            const _handle = unref(target).querySelector("[move]") as HTMLElement
             _handle ? handle.value = _handle : handle.value = target.value as HTMLElement
             handle.value.style.cursor = "move"
         }
@@ -54,10 +54,10 @@ export function useLayerDialog(target: Ref<HTMLElement | SVGElement | null | und
     function pointerdown(e: PointerEvent) {
         e.stopPropagation()
         dragging.value = true
-        const { top, left, height, width } = getBoundingClientRectByPointerEvent(e)
+        const { top, left, height, width } = getBoundingClientRect(unref(target))
 
-        targetDistance.left = e.pageX - left
-        targetDistance.top = e.pageY - top
+        targetDistance.left = e.clientX - left
+        targetDistance.top = e.clientY - top
 
         if (lockBoundary) {
             targetDistance.height = height
@@ -71,19 +71,14 @@ export function useLayerDialog(target: Ref<HTMLElement | SVGElement | null | und
     function pointermove(e: PointerEvent) {
         e.stopPropagation()
         if (!dragging.value) return
-        const left = e.pageX - unref(bounding).left - targetDistance.left
-        const top = e.pageY - unref(bounding).top - targetDistance.top
+        const left = e.clientX - unref(bounding).left - targetDistance.left
+        const top = e.clientY - unref(bounding).top - targetDistance.top
 
         // 如果边界被锁定，移动超出边界则不允许移动
-        if (lockBoundary) {
-            const { top: ctop, left: cleft, height: cheight, width: cwidth } = getBoundingClientRectByPointerEvent(e)
+        const _top = lockBoundary ? Math.min(Math.max(0, top), unref(bounding).height - targetDistance.height) : top
+        const _left = lockBoundary ? Math.min(Math.max(0, left), unref(bounding).width - targetDistance.width) : left
 
-            if (cleft < unref(bounding).left || ctop < unref(bounding).top || cleft + cwidth > unref(bounding).right || ctop + cheight > unref(bounding).bottom) {
-                return
-            }
-        }
-
-        postion.value = { top, left }
+        postion.value = { top: _top, left: _left }
     }
 
     function pointerup(e: PointerEvent) {
