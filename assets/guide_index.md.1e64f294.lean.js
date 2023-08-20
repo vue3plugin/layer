@@ -1,0 +1,1 @@
+import{_ as e,o,c as t,S as a}from"./chunks/framework.b859801f.js";const h=JSON.parse('{"title":"产生的原有","description":"","frontmatter":{},"headers":[],"relativePath":"guide/index.md","filePath":"guide/index.md"}'),c={name:"guide/index.md"},d=a("",6),i=[d];function n(_,p,r,s,l,u){return o(),t("div",null,i)}const f=e(c,[["render",n]]);export{h as __pageData,f as default};
