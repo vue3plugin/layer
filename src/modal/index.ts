@@ -46,7 +46,7 @@ export function useLayerDialog(target: Ref<HTMLElement>, props?: LayerDialogProp
     const dragging = shallowRef(false)
 
     // 鼠标距离元素内部最小矩形的上下边距
-    const targetDistance = {
+    const targetInfo = {
         top: 0,
         left: 0,
         height: 0,
@@ -59,12 +59,12 @@ export function useLayerDialog(target: Ref<HTMLElement>, props?: LayerDialogProp
         dragging.value = true
         const { top, left, height, width } = getBoundingClientRect(unref(target))
 
-        targetDistance.left = e.clientX - left
-        targetDistance.top = e.clientY - top
+        targetInfo.left = e.clientX - left
+        targetInfo.top = e.clientY - top
 
         if (lockBoundary) {
-            targetDistance.height = height
-            targetDistance.width = width
+            targetInfo.height = height
+            targetInfo.width = width
         }
 
         document.addEventListener("pointermove", pointermove)
@@ -74,12 +74,12 @@ export function useLayerDialog(target: Ref<HTMLElement>, props?: LayerDialogProp
     function pointermove(e: PointerEvent) {
         e.stopPropagation()
         if (!dragging.value) return
-        const left = e.clientX - unref(bounding).left - targetDistance.left
-        const top = e.clientY - unref(bounding).top - targetDistance.top
+        const left = e.clientX - unref(bounding).left - targetInfo.left
+        const top = e.clientY - unref(bounding).top - targetInfo.top
 
         // 如果边界被锁定，移动超出边界则不允许移动
-        const _top = lockBoundary ? Math.min(Math.max(0, top), unref(bounding).height - targetDistance.height) : top
-        const _left = lockBoundary ? Math.min(Math.max(0, left), unref(bounding).width - targetDistance.width) : left
+        const _top = lockBoundary ? Math.min(Math.max(0, top), unref(bounding).height - targetInfo.height) : top
+        const _left = lockBoundary ? Math.min(Math.max(0, left), unref(bounding).width - targetInfo.width) : left
 
         postion.value = { top: _top, left: _left }
     }
