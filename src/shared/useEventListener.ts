@@ -1,11 +1,17 @@
-import { onMounted, onUnmounted } from "vue";
+import { type Ref, onUnmounted, unref, watchEffect } from "vue";
 
-export function useEventListener<K extends keyof DocumentEventMap>(element: HTMLElement | Document, type: K, listener: (ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions) {
+export function useEventListener<K extends keyof DocumentEventMap>(element: Ref<HTMLElement | Document>, type: K, listener: (ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions) {
     const event = (ev) => listener(ev)
-    onMounted(() => {
-        element.addEventListener(type, event, options)
+
+    const stop = watchEffect(() => {
+        if (!unref(element)) {
+            return
+        }
+        unref(element).addEventListener(type, event, options)
+        stop()
     })
+
     onUnmounted(() => {
-        element.removeEventListener(type, event)
+        unref(element).removeEventListener(type, event)
     })
 }

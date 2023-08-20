@@ -1,8 +1,9 @@
-import { Ref, computed, ref, shallowRef, unref, watch, nextTick, onMounted } from "vue";
+import { Ref, computed, ref, shallowRef, unref, watch, nextTick } from "vue";
 import { type LayerDialogPlaceMent, type LayerDialogProps, parserLayerPlacement } from './dialog';
-import { getBoundingClientRect, getBoundingClientRectByPointerEvent, getBoundingClientRectByTo } from "./componsition/tools";
-import { useElementVisibility, useEventListener } from "@vueuse/core"
+import { getBoundingClientRect } from "./componsition/tools";
 import { useZIndex } from "../shared/useZIndex";
+import { useEventListener } from "../shared/useEventListener";
+import { useBodyResize } from "../shared/useWindowResize";
 
 export {
     LayerDialogProps,
@@ -11,11 +12,11 @@ export {
 /**
  * @param target - 可拖动目标元素
 */
-export function useLayerDialog(target: Ref<HTMLElement | SVGElement | null | undefined>, props?: LayerDialogProps) {
+export function useLayerDialog(target: Ref<HTMLElement>, props?: LayerDialogProps) {
     type Position = { top: number, left: number }
 
-    const { placement = "auto", to = ref("body"), lockBoundary = false } = props || {}
-    const targetIsVisible = useElementVisibility(target)
+    const { placement = "auto", to = ref(), lockBoundary = false } = props || {}
+
     let lockInitPlacement = false // 锁定初始化时的，位置设置影响到 setPlacement 直接设置
     const zIndex = useZIndex()
 
@@ -24,19 +25,21 @@ export function useLayerDialog(target: Ref<HTMLElement | SVGElement | null | und
     // 需要移动的元素
     const handle = ref<HTMLElement>()
 
-    watch(targetIsVisible, (visible) => {
-        if (visible) {
+    watch(target, (target) => {
+        if (target) {
             // 处理需要移动的元素
             const _handle = unref(target).querySelector("[move]") as HTMLElement
-            _handle ? handle.value = _handle : handle.value = target.value as HTMLElement
+            _handle ? handle.value = _handle : handle.value = target as HTMLElement
             handle.value.style.cursor = "move"
         }
         // 监听目标元素是否可见
-        (visible && !lockInitPlacement) ? setPlacement(placement) : ''
+        (target && !lockInitPlacement) ? setPlacement(placement) : ''
     })
 
     // 根据 boundingRef 确定元素活动最大边界
-    const bounding = computed(() => getBoundingClientRectByTo(unref(to)))
+    const triggerBounding = ref(0)
+    useBodyResize(to, () => triggerBounding.value++) // 用于更新 bounding
+    const bounding = computed(() => (triggerBounding.value, getBoundingClientRect(unref(to))))
 
     const style = computed(() => ({ top: `${unref(postion).top}px`, left: `${unref(postion).left}px` }))
 
@@ -101,11 +104,11 @@ export function useLayerDialog(target: Ref<HTMLElement | SVGElement | null | und
         // 设置Zindex
         unref(target).style.zIndex = zIndex.value + ''
 
-        if (to.value == "body") {
+        if (!to.value) {
             unref(target).style.position = "fixed"
         } else {
             unref(target).style.position = "absolute"
-            unref(bounding).el.style.position = "relative"
+            unref(to).style.position = "relative"
         }
         postion.value = { top, left }
         setTimeout(() => {
