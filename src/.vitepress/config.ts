@@ -2,12 +2,15 @@ import { componentPreview, containerPreview } from '@vitepress-demo-preview/plug
 import { resolve } from 'path';
 import { defineConfig } from 'vitepress'
 import { name as pkgName } from "../../package.json"
+import nav from './configs/nav';
+import sidebar from './configs/sidebar';
 
 function pathResolve(dir: string) {
   return resolve(__dirname, ".", dir);
 }
-console.log(pathResolve(".."))
+
 export default defineConfig({
+  title: pkgName,
   markdown: {
     theme: {
       light: 'vitesse-light',
@@ -18,6 +21,13 @@ export default defineConfig({
       md.use(componentPreview)
       md.use(containerPreview)
     }
+  },
+  themeConfig:{
+    nav,
+    sidebar,
+    socialLinks: [
+      { icon: 'github', link: 'https://github.com/vue3plugin/layer' }
+    ],
   },
   vue: {
     script: {

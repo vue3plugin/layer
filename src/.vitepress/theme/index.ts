@@ -6,7 +6,6 @@ import "./index.css"
 
 export default {
   ...theme,
-  title: "弹出元素",
   enhanceApp({app}) {
     app.component('demo-preview', AntDesignContainer)
   }

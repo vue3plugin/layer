@@ -1,9 +1,14 @@
 <template>
-    <div ref="target" class="gray-400/30 rounded w-fit bg-black text-white p-4" :style="{ ...style }" v-if="visible">
-        <div>💥危险提示</div>
+    <div ref="target" style="height: 200px;width: 300px;" class="rounded w-fit bg-black text-white p-4" id="xxx"
+        :style="{ ...style }" v-if="visible">
+        <div class=" flex justify-between" >
+            <div move>💥拖动标题</div>
+            <button class="btn" @click="close">X</button>
+        </div>
         <div>设备离线，请立即检查</div>
-        <button class="btn" @click="visible = false">关闭</button>
+
     </div>
+
     <div class=" flex justify-between">
         <button class="btn" @click="handlePlacement('auto')">中间</button>
         <button class="btn" @click="handlePlacement('t')">上</button>
@@ -23,11 +28,15 @@ import { ref } from 'vue';
 const target = ref()
 const visible = ref(false)
 
-const { style, setPlacement } = useLayerDialog(target, { placement: "auto", })
+const { style, setPlacement } = useLayerDialog(target, { placement: "auto", lockBoundary: true})
 
 function handlePlacement(placement: LayerDialogPlaceMent) {
     visible.value = true
     setPlacement(placement)
+}
+
+function close(e) {
+    visible.value = false
 }
 </script>
 <style scoped>

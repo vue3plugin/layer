@@ -11,8 +11,21 @@ hero:
   actions:
     - theme: brand
       text: 开始
-      link: /demos/dialog
+      link: /guide/index
     - theme: alt
-      text: View on GitHub
-      link: https://github.com/vuejs/vitepress
+      text: GitHub
+      link: https://github.com/vue3plugin/layer
+features:
+- icon: 🛠️
+  title: 和UI无关
+  details: 一套和UI无关的弹出式组件，方便根据自身业务快速定制
+- icon:
+    src: /cool-feature-icon.svg
+  title: Vue3
+  details: 基于Vue3生态定制
+- icon:
+    dark: /dark-feature-icon.svg
+    light: /light-feature-icon.svg
+  title: 一个橙子pro
+  details: 由前端工程师
 ---
